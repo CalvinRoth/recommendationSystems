@@ -19,10 +19,14 @@ def updateV(R, U, lama):
         V[i,:] = R[:,i]@  U @ lin.inv(U.T @ U + lama * np.eye(d, d))
     return V
 
+def loss(A, U,V, lama):
+    L = lin.norm(A - (U@V.T), "fro")**2
+    L += lama * ( lin.norm(U, "fro")**2 + lin.norm(V, "fro")**2)
+    return L
+
 
 def ALS(R, d, lama, iters=100):
     [m, n] = R.shape
-    print(lin.matrix_rank(R))
     U = 0.01 * np.random.randn(m, d)
     V = np.zeros((n, d))
     old = 0
@@ -37,3 +41,5 @@ def ALS(R, d, lama, iters=100):
             break
 
     return U, V
+
+

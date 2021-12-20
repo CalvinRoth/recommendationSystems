@@ -37,7 +37,7 @@ def partitionData(A):
     B = np.copy(A)
     preds = np.zeros((n,))
     for user in range(n):
-        choices = np.nonzero(A[user, :])[0]
+        choices = np.where(A[user, :] > 3)[0]
         i = np.random.choice(np.nonzero(A[user, :])[0])
         preds[user] = i
         B[user, i] = 0
@@ -46,14 +46,14 @@ def partitionData(A):
 
 def sortedRecs(A, predictMat, k):
     [n_users, n_items] = A.shape
-    predicts = np.zeros((n_users, k))
+    predicts = np.zeros((n_users, n_items))
     for user in range(n_users):
-        v = np.where(A[users, :] == 0)
+        v = np.where(A[user, :] == 0)
         vals = []
         for item in range(n_items):
             if item in v[0]:
                 vals.append((item, predictMat[user, item]))
-        v = sorted(vals, key=lambda x: x[1], reverse=True)[0:k]
+        v = sorted(vals, key=lambda x: x[1], reverse=True)
         row = np.array([i[0] for i in v])
         predicts[user, :] = row
     return predicts
@@ -66,7 +66,6 @@ def hitrate(trueMat, left_out, preds):
         if (left_out in preds[i, :]):
             hits += 1
     return hits / n_users
-
 
 
 
@@ -120,15 +119,18 @@ def ALStes():
 path = "data/ratings.csv"
 ## Test for ALS
 A = readData(path)
-training, left_out = partitionData(A)
+#training, left_out = partitionData(A)
 
 # uncomment me to run test
-print(ALStes())
+#print(ALStes())
 
 
 ## Pure SVD
 A = readDataRaw(path)
+training, left_out = partitionData(A)
 #
-PUREsvd.pureTest(A, [252,478, 578])
+#PUREsvd.pureTest(A, [252,478, 578])
+U,V = PUREsvd.pureSVD(training, 200)
+
 
 
